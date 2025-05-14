@@ -1,0 +1,32 @@
+quarkus:
+  profile: dev
+
+  datasource:
+    db-kind: postgresql
+    reactive:
+      # default points at our Docker service name 'db'
+      url: ${QUARKUS_DATASOURCE_REACTIVE_URL:postgresql://db:5432/capi-shop}
+      username: ${QUARKUS_DATASOURCE_REACTIVE_USERNAME:capi-user}
+      password: ${QUARKUS_DATASOURCE_REACTIVE_PASSWORD:capi-pass}
+      max-size: 20
+      # disable Quarkus DevServices to avoid auto-starting another Postgres container
+      devservices:
+        enabled: false
+
+  hibernate-orm:
+    database:
+      generation: none
+    log:
+      sql: true
+
+  liquibase:
+    enabled: true
+    change-log: db/changelog/changelog-master.xml
+
+  http:
+    root-path: /
+    cors: true
+    cors.origins: "*"
+    cors.methods: GET,POST,PUT,DELETE,OPTIONS,HEAD
+    cors.headers: origin,content-type,accept,authorization
+    cors.access-control-allow-credentials: true
