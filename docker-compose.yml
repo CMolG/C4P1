@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: capi-shop-db
+    environment:
+      POSTGRES_DB: capi-shop
+      POSTGRES_USER: capi-user
+      POSTGRES_PASSWORD: capi-pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U capi-user -d capi-shop"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: capi-shop-app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      QUARKUS_DATASOURCE_REACTIVE_URL:     postgresql://db:5432/capi-shop
+      QUARKUS_DATASOURCE_REACTIVE_USERNAME: capi-user
+      QUARKUS_DATASOURCE_REACTIVE_PASSWORD: capi-pass
+      QUARKUS_DATASOURCE_REACTIVE_DEV_SERVICES_ENABLED: "false"
+
+volumes:
+  db-data:

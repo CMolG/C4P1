@@ -1,0 +1,78 @@
+# src/main/resources/application.yaml
+"%prod":
+  quarkus:
+    log:
+      level: INFO
+
+    http:
+      host: '0.0.0.0'
+      root-path: '/'
+      port: '8080'
+      cors:
+        ~: true
+        origins: '*'
+        methods: 'GET,POST,PUT,DELETE,OPTIONS,HEAD'
+        headers: 'origin,content-type,accept,authorization'
+        access-control-allow-credentials: true
+
+    datasource:
+      db-kind: postgresql
+      jdbc:
+        driver:   org.postgresql.Driver
+        url:      ${QUARKUS_DATASOURCE_JDBC_URL:}
+        username: ${QUARKUS_DATASOURCE_JDBC_USERNAME:}
+        password: ${QUARKUS_DATASOURCE_JDBC_PASSWORD:}
+        devservices:
+          enabled: false
+
+    hibernate-orm:
+      database:
+        generation: none
+      log:
+        sql: true
+
+    liquibase:
+      enabled: true
+      change-log: db/changelog/changelog-master.xml
+
+    cache:
+      enabled: true
+      caffeine:
+        expire-after-access: 5M
+        maximum-size: 1000
+
+"%dev":
+  quarkus:
+    http:
+      port: 8080
+
+    datasource:
+      db-kind: postgresql
+      jdbc:
+        username: postgres
+        password: postgres
+        devservices:
+          enabled: true
+
+    liquibase:
+      datasources: default
+      migrate-at-start: true
+      enabled: true
+      change-log: db/changelog/changelog-master.xml
+
+"%test":
+  quarkus:
+    http:
+      port: 0
+
+    datasource:
+      db-kind: postgresql
+      jdbc:
+        devservices:
+          enabled: true
+
+    liquibase:
+      datasources: default
+      migrate-at-start: true
+      enabled: true
+      change-log: db/changelog/changelog-master.xml
